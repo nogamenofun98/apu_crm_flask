@@ -35,7 +35,7 @@ def user_details(user_id):
 
 def get_users():
     user_schema = UserSchema(many=True)  # many=True is to get many object
-    users_list = UserController.get_users()
+    users_list = UserController.get_items()
     if users_list is None:
         response = {
             'message': 'no user created'
@@ -58,7 +58,7 @@ def create_user_details():
                 'message': 'user already exists'
             }
             return jsonify(response), 403
-        error = UserController.create_user(username=data['username'], user_full_name=data['user_full_name'],
+        error = UserController.create_item(username=data['username'], user_full_name=data['user_full_name'],
                                            user_email=data['user_email'])
         if error is not None:
             response = {
@@ -79,7 +79,7 @@ def create_user_details():
 
 def get_user_details(user_id):
     user_schema = UserSchema()
-    user = UserController.find_user_by_id(user_id)
+    user = UserController.find_by_id(user_id)
     if user is None:
         response = {
             'message': 'user does not exist'
@@ -96,7 +96,7 @@ def get_user_details(user_id):
 def update_user(user_id):
     data = request.get_json()
     if 'username' in data and 'password' in data and 'name' in data:
-        user = UserController.find_user_by_id(user_id)
+        user = UserController.find_by_id(user_id)
         # print(user)
         user.username = data['username']
         user.password = data['password']
@@ -115,7 +115,7 @@ def update_user(user_id):
 
 
 def delete_user(user_id):
-    user = UserController.find_user_by_id(user_id)
+    user = UserController.find_by_id(user_id)
     error = user.delete()
     if error is not None:
         response = {

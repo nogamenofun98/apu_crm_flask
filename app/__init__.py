@@ -28,6 +28,8 @@ def create_app():
     app.register_blueprint(user_route.user_bp)
     from app.modules.UserRoleModule import routes as role_route
     app.register_blueprint(role_route.user_role_bp)
+    from app.modules.IndustryAreaModule import routes as area_route
+    app.register_blueprint(area_route.industry_area_bp)
 
     from app.services.AuthMiddleware import AuthMiddleware
     app.wsgi_app = AuthMiddleware(app.wsgi_app)

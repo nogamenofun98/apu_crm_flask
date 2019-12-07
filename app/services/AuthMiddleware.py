@@ -50,7 +50,7 @@ class AuthMiddleware:
             #     print(member_element.text) << do the if statement here
             with app.app_context():
                 if UserController.find_user_by_username(username) is None:
-                    error = UserController.create_user(username, full_name, email)
+                    error = UserController.create_item(username, full_name, email)
                     if error is not None:
                         response = {
                             'status': 'error',

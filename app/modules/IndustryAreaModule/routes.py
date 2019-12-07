@@ -1,29 +1,29 @@
 from flask import jsonify, request, json, Blueprint
 
 from app import db
-from app.models.Schemas import UserRoleSchema
-from app.modules.UserRoleModule.UserRoleController import UserRoleController
+from app.models.Schemas import IndustryAreaSchema
+from app.modules.IndustryAreaModule.IndustryAreaController import IndustryAreaController
 
-user_role_bp = Blueprint('user_role_bp', __name__)
+industry_area_bp = Blueprint('industry_area_bp', __name__)
 
 
-@user_role_bp.route("/roles", methods=['GET', 'POST'])
+@industry_area_bp.route("/industry-areas", methods=['GET', 'POST'])
 def roles():
     if request.method == 'POST':
-        return create_role()
+        return create_item()
     else:
-        return get_roles()
+        return get_items()
 
 
-@user_role_bp.route("/roles/<int:item_id>", methods=['GET', 'PUT', 'DELETE'])
-def role_details(item_id):
+@industry_area_bp.route("/industry-areas/<int:item_id>", methods=['GET', 'PUT', 'DELETE'])
+def item_details(item_id):
     # user_id = request.args.get('user_id')  # also can use for capture request GET param
     if request.method == 'GET':
-        return get_role_details(item_id)
+        return get_item_details(item_id)
     elif request.method == 'PUT':
-        return update_role(item_id)
+        return update_item(item_id)
     elif request.method == 'DELETE':
-        return delete_role(item_id)
+        return delete_item(item_id)
     response = {
         'status': 'error',
         'message': 'Bad request body.'
@@ -31,15 +31,15 @@ def role_details(item_id):
     return jsonify(response), 400
 
 
-def get_roles():
-    role_schema = UserRoleSchema(many=True)
-    role_list = UserRoleController.get_items()
-    if role_list is None:
+def get_items():
+    item_schema = IndustryAreaSchema(many=True)
+    item_list = IndustryAreaController.get_items()
+    if item_list is None:
         response = {
-            'message': 'No role created.'
+            'message': 'No area created.'
         }
         return jsonify(response), 404
-    result = role_schema.dumps(role_list)
+    result = item_schema.dumps(item_list)
     json_response = json.loads(result)
     response = {
         'data_response': json_response,
@@ -47,10 +47,10 @@ def get_roles():
     return jsonify(response), 200
 
 
-def create_role():
+def create_item():
     data = request.get_json()
-    if 'user_role_description' in data and 'user_role_json' in data:
-        error = UserRoleController.create_item(data['user_role_description'], data['user_role_json'])
+    if 'industry_name' in data and 'industry_desc' in data:
+        error = IndustryAreaController.create_item(data['industry_name'], data['industry_desc'])
         if error is not None:
             response = {
                 'status': 'error',
@@ -58,7 +58,7 @@ def create_role():
             }
             return jsonify(response), 400
         response = {
-            'message': "New role registered."
+            'message': "New area registered."
         }
         return jsonify(response), 202
     response = {
@@ -68,15 +68,15 @@ def create_role():
     return jsonify(response), 400
 
 
-def get_role_details(item_id):
-    role_schema = UserRoleSchema()
-    role = UserRoleController.find_by_id(item_id)
-    if role is None:
+def get_item_details(item_id):
+    item_schema = IndustryAreaSchema()
+    item = IndustryAreaController.find_by_id(item_id)
+    if item is None:
         response = {
-            'message': 'Role does not exist.'
+            'message': 'Area does not exist.'
         }
         return jsonify(response), 404
-    result = role_schema.dumps(role)
+    result = item_schema.dumps(item)
     json_response = json.loads(
         result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
@@ -85,17 +85,17 @@ def get_role_details(item_id):
     return jsonify(response), 200
 
 
-def update_role(item_id):
+def update_item(item_id):
     data = request.get_json()
-    if 'user_role_description' in data and 'user_role_json' in data:
-        role = UserRoleController.find_by_id(item_id)
+    if 'industry_name' in data and 'industry_desc' in data:
+        item = IndustryAreaController.find_by_id(item_id)
         # print(user)
-        role.user_role_description = data['user_role_description']
-        role.user_role_json = data['user_role_json']
+        item.industry_name = data['industry_name']
+        item.industry_desc = data['industry_desc']
 
         db.session.commit()
         response = {
-            'message': 'Role updated.'
+            'message': 'Area updated.'
         }
         return jsonify(response), 202
     response = {
@@ -105,9 +105,9 @@ def update_role(item_id):
     return jsonify(response), 400
 
 
-def delete_role(item_id):
-    role = UserRoleController.find_by_id(item_id)
-    error = role.delete()
+def delete_item(item_id):
+    item = IndustryAreaController.find_by_id(item_id)
+    error = item.delete()
     if error is not None:
         response = {
             'status': 'error',
@@ -115,6 +115,6 @@ def delete_role(item_id):
         }
         return jsonify(response), 400
     response = {
-        'message': 'Role deleted.'
+        'message': 'Area deleted.'
     }
     return jsonify(response), 202
