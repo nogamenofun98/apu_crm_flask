@@ -8,7 +8,7 @@ industry_area_bp = Blueprint('industry_area_bp', __name__)
 
 
 @industry_area_bp.route("/industry-areas", methods=['GET', 'POST'])
-def roles():
+def routes():
     if request.method == 'POST':
         return create_item()
     else:

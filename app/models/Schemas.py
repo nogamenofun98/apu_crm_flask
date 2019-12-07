@@ -49,6 +49,9 @@ class IndustryAreaSchema(ma.ModelSchema):
 class UserSchema(ma.ModelSchema):
     class Meta:
         model = User
+        # fields = ('user_id', 'username', 'user_full_name', 'user_email', 'user_role', 'user_handle_industry_id')
+        # user_role = ma.Nested("UserRoleSchema")
+        # faild to nested schema the Role model into the User model when dump out, maybe try ask CTI
 
 
 class UserReportSchema(ma.ModelSchema):

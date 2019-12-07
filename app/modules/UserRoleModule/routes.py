@@ -8,22 +8,22 @@ user_role_bp = Blueprint('user_role_bp', __name__)
 
 
 @user_role_bp.route("/roles", methods=['GET', 'POST'])
-def roles():
+def routes():
     if request.method == 'POST':
-        return create_role()
+        return create_item()
     else:
-        return get_roles()
+        return get_items()
 
 
 @user_role_bp.route("/roles/<int:item_id>", methods=['GET', 'PUT', 'DELETE'])
-def role_details(item_id):
+def item_details(item_id):
     # user_id = request.args.get('user_id')  # also can use for capture request GET param
     if request.method == 'GET':
-        return get_role_details(item_id)
+        return get_item_details(item_id)
     elif request.method == 'PUT':
-        return update_role(item_id)
+        return update_item(item_id)
     elif request.method == 'DELETE':
-        return delete_role(item_id)
+        return delete_item(item_id)
     response = {
         'status': 'error',
         'message': 'Bad request body.'
@@ -31,7 +31,7 @@ def role_details(item_id):
     return jsonify(response), 400
 
 
-def get_roles():
+def get_items():
     role_schema = UserRoleSchema(many=True)
     role_list = UserRoleController.get_items()
     if role_list is None:
@@ -47,7 +47,7 @@ def get_roles():
     return jsonify(response), 200
 
 
-def create_role():
+def create_item():
     data = request.get_json()
     if 'user_role_description' in data and 'user_role_json' in data:
         error = UserRoleController.create_item(data['user_role_description'], data['user_role_json'])
@@ -68,7 +68,7 @@ def create_role():
     return jsonify(response), 400
 
 
-def get_role_details(item_id):
+def get_item_details(item_id):
     role_schema = UserRoleSchema()
     role = UserRoleController.find_by_id(item_id)
     if role is None:
@@ -85,7 +85,7 @@ def get_role_details(item_id):
     return jsonify(response), 200
 
 
-def update_role(item_id):
+def update_item(item_id):
     data = request.get_json()
     if 'user_role_description' in data and 'user_role_json' in data:
         role = UserRoleController.find_by_id(item_id)
@@ -105,7 +105,7 @@ def update_role(item_id):
     return jsonify(response), 400
 
 
-def delete_role(item_id):
+def delete_item(item_id):
     role = UserRoleController.find_by_id(item_id)
     error = role.delete()
     if error is not None:

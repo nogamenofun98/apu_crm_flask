@@ -11,7 +11,7 @@ class User(ModelOperation, db.Model):
     user_email = db.Column(db.String(255), nullable=False, unique=True)
     user_role_id = db.Column(db.ForeignKey('user_role.user_role_id'), nullable=True, index=True)
     user_handle_industry_id = db.Column(db.ForeignKey('industry_area.industry_id'), nullable=True, index=True)
-    user_handle_industry = db.relationship('IndustryArea', backref="user")
+    user_handle_industry = db.relationship('IndustryArea', backref="users")
     user_role = db.relationship('UserRole', backref="users")
 
     def __init__(self, username, user_full_name, user_email) -> None:
