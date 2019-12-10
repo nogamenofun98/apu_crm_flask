@@ -46,9 +46,22 @@ class AuthMiddleware:
             member_of = root.findall("cas:authenticationSuccess/cas:attributes/cas:memberOf",
                                      Config.XML_NAMESPACES)
             # return group of Element, this will use for limit which user to login
-            # for member_element in member_of:
-            #     print(member_element.text) << do the if statement here
+            for member_element in member_of:
+                # if Config.blackListMemberOf.index(member_element.text):
+                if member_element.text in Config.blackListMemberOf:
+                    # block the access
+                    # print(member_element.text)
+                    response = {
+                        'status': 'error',
+                        'message': 'Account is not authorised to use this service!'
+                    }
+                    import json
+                    response_object = Response(json.dumps(response), 401)
+                    response_object.headers['content-type'] = "application/json"
+                    return response_object(environ, start_response)
+
             with app.app_context():
+                # print('if acc error, shudnt be here')
                 if UserController.find_user_by_username(username) is None:
                     error = UserController.create_item(username, full_name, email)
                     if error is not None:
@@ -56,7 +69,9 @@ class AuthMiddleware:
                             'status': 'error',
                             'message': error
                         }
-                        from flask import jsonify
-                        return jsonify(response), 400
+                        import json
+                        response_object = Response(json.dumps(response), 400)
+                        response_object.headers['content-type'] = "application/json"
+                        return response_object(environ, start_response)
 
         return self.app(environ, start_response)

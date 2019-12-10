@@ -7,6 +7,7 @@ class Config(object):
     CSRF_ENABLED = True
     CAS_URL = "https://cas.apiit.edu.my"
     XML_NAMESPACES = {'cas': 'http://www.yale.edu/tp/cas'}  # add more as needed
+    blackListMemberOf = ['CN=All Students,OU=Email Distribution Lists,DC=techlab,DC=apiit,DC=edu,DC=my']
 
 
 class ConfigDB(Config):
