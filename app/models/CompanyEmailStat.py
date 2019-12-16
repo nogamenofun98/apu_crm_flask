@@ -7,7 +7,7 @@ class CompanyEmailStat(ModelOperation, db.Model):
 
     comp_email_id = db.Column(db.Integer, primary_key=True, unique=True)
     comp_user_id = db.Column(db.ForeignKey('user.user_id'), nullable=False, index=True)
-    comp_comp_id = db.Column(db.ForeignKey('company.company_reg_nun'), nullable=False, index=True)
+    comp_comp_id = db.Column(db.ForeignKey('company.company_reg_num'), nullable=False, index=True)
     comp_open_time = db.Column(db.TIMESTAMP)
     comp_sum_open = db.Column(db.Integer, nullable=False)
     comp_status_id = db.Column(db.ForeignKey('email_status.status_id'), nullable=False, index=True)

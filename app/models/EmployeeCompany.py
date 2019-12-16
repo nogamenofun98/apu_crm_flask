@@ -6,7 +6,7 @@ class EmployeeCompany(ModelOperation, db.Model):
     __tablename__ = 'employee_company'
 
     alumnus_id = db.Column(db.ForeignKey('employee.employee_id'), primary_key=True, unique=True)
-    company_id = db.Column(db.ForeignKey('company.company_reg_nun'), primary_key=True, nullable=False, index=True)
+    company_id = db.Column(db.ForeignKey('company.company_reg_num'), primary_key=True, nullable=False, index=True)
     designation = db.Column(db.String(255), nullable=False)
     department = db.Column(db.String(255), nullable=False)
     hired_time = db.Column(db.TIMESTAMP)

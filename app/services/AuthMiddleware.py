@@ -1,4 +1,4 @@
-from werkzeug import Request, Response
+from flask import Request, Response
 
 from app.config import Config
 from app.modules.UserModule.UserController import UserController
@@ -14,6 +14,7 @@ class AuthMiddleware:
     def __call__(self, environ, start_response):
         # not Flask request - from werkzeug.wrappers import Request
         request = Request(environ)
+
         if request.method != 'OPTIONS':
             service = request.args.get("service")
             ticket = request.args.get("ticket")
@@ -62,7 +63,8 @@ class AuthMiddleware:
 
             with app.app_context():
                 # print('if acc error, shudnt be here')
-                if UserController.find_user_by_username(username) is None:
+                user = UserController.find_user_by_username(username)
+                if user is None:
                     error = UserController.create_item(username, full_name, email)
                     if error is not None:
                         response = {
@@ -73,5 +75,6 @@ class AuthMiddleware:
                         response_object = Response(json.dumps(response), 400)
                         response_object.headers['content-type'] = "application/json"
                         return response_object(environ, start_response)
-
+                else:
+                    environ['QUERY_STRING'] += '&user_id=' + str(user.user_id)
         return self.app(environ, start_response)
