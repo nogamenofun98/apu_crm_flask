@@ -56,4 +56,4 @@ class Company(ModelOperation, db.Model):
 
     @staticmethod
     def get_all():
-        return Company.query.all()
+        return Company.query.filter_by(is_hide=False).all()

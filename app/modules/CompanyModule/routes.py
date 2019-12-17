@@ -1,6 +1,7 @@
 from flask import jsonify, request, json, Blueprint
+from flask_uploads import UploadNotAllowed
 
-from app import db
+from app import db, files
 from app.models.Schemas import CompanySchema
 from app.modules.CompanyModule.CompanyController import CompanyController
 from app.modules.UserModule.UserController import UserController
@@ -9,6 +10,61 @@ company_bp = Blueprint('company_bp', __name__)
 company_fields = ['company_reg_num', 'company_name', 'company_size', 'company_industry_id',
                   'company_desc', 'company_office_contact_num', 'company_address', 'company_postcode', 'company_city',
                   'company_state', 'company_country']
+
+
+@company_bp.route("/companies/uploader", methods=['GET', 'POST'])
+def uploader():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        # if 'csv' not in request.files:
+        # file = request.files['csv']
+        # print(file)
+        try:
+            filename = files.save(request.files['csv'])
+        except UploadNotAllowed as err:
+            response = {
+                'status': 'test',
+                'message': "File upload is not allowed!" + str(err)
+            }
+            return jsonify(response), 400
+        # below is the for loop code and creation code
+        user = UserController.find_by_id(request.args.get("user_id"))
+        from app.config import Config
+        with open(Config.UPLOADS_DEFAULT_DEST + "files/" + filename, mode='r') as csv_file:
+            import csv
+            csv_reader = csv.DictReader(csv_file)
+            error_message = ""
+            for row in csv_reader:
+                is_area_check = check_area(user.user_handle_industry, int(row['company_industry_id']))
+                if not is_area_check:
+                    error_message += "\r\n" + row[
+                        'company_reg_num'] + ": Cannot create company that not belong to logon user\'s industry area. "
+                else:
+                    error = CompanyController.create_item(company_reg_num=row['company_reg_num'],
+                                                          company_name=row['company_name'],
+                                                          company_size=row['company_size'],
+                                                          company_industry_id=row['company_industry_id'],
+                                                          company_desc=row['company_desc'],
+                                                          company_office_contact_num=row[
+                                                              'company_office_contact_num'],
+                                                          company_address=row['company_address']
+                                                          , company_postcode=row['company_postcode'],
+                                                          company_city=row['company_city'],
+                                                          company_state=row['company_state'],
+                                                          company_country=row['company_country'])
+                    if error is not None:
+                        error_message += "\r\n" + row['company_reg_num'] + ": " + error
+        response = {
+            'status': 'done',
+            'message': "All imported" if error_message == "" else error_message
+        }
+        return jsonify(response), 200 if error_message == "" else 400
+    else:
+        response = {
+            'status': 'success',
+            'url': files.url('company_template.csv')
+        }
+        return jsonify(response), 200
 
 
 @company_bp.route("/companies", methods=['GET', 'POST'])
@@ -169,14 +225,16 @@ def update_item(item_id):
 
 def delete_item(item_id):
     item = CompanyController.find_by_id(item_id)
-    error = item.delete()
-    if error is not None:
-        response = {
-            'status': 'error',
-            'message': error
-        }
-        return jsonify(response), 400
+    item.is_hide = True
+    db.session.commit()
+    # error = item.delete()
+    # if error is not None:
+    #     response = {
+    #         'status': 'error',
+    #         'message': error
+    #     }
+    #     return jsonify(response), 400
     response = {
-        'message': 'Company deleted.'
+        'message': 'Company soft deleted.'
     }
     return jsonify(response), 202
