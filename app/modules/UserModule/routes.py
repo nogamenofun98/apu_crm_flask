@@ -61,7 +61,7 @@ def create_item():
             return jsonify(response), 403
         error = UserController.create_item(username=data['username'], user_full_name=data['user_full_name'],
                                            user_email=data['user_email'])
-        if error is not None:
+        if type(error) is str:
             response = {
                 'status': 'error',
                 'message': error
@@ -117,7 +117,7 @@ def update_item(user_id):
 def delete_item(user_id):
     user = UserController.find_by_id(user_id)
     error = user.delete()
-    if error is not None:
+    if type(error) is str:
         response = {
             'status': 'error',
             'message': error

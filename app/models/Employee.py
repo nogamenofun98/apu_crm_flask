@@ -18,20 +18,20 @@ class Employee(ModelOperation, db.Model):
     employee_contact_num = db.Column(db.String(15))
     employee_email = db.Column(db.String(255))
     employee_intake_code = db.Column(db.String(255))
-    employee_grad_time = db.Column(db.DATE)
-    employee_industry_id = db.Column(db.ForeignKey('industry_area.industry_id'), nullable=False, index=True)
-    employee_current_company_Id = db.Column(db.ForeignKey('company.company_reg_num'), nullable=False, index=True)
-    employee_last_contact_time = db.Column(db.TIMESTAMP)
-    employee_alumnus = db.Column(db.Integer, nullable=False)
+    employee_grad_time = db.Column(db.String(255))
+    employee_industry_id = db.Column(db.ForeignKey('industry_area.industry_id'), index=True)
+    # employee_current_company_Id = db.Column(db.ForeignKey('company.company_reg_num'), index=True)
+    employee_last_contact_time = db.Column(db.String(255))
+    employee_alumnus = db.Column(db.Boolean, nullable=False)
     is_hide = db.Column(db.Boolean, nullable=False, server_default=expression.false())
 
     employee_industry = db.relationship('IndustryArea', backref="employee")
 
+    def __init__(self, employee_full_name, employee_alumnus):
+        super().__init__()
+        self.employee_full_name = employee_full_name
+        self.employee_alumnus = employee_alumnus
+
     @staticmethod
     def get_all():
-        return Employee.query.all()
-
-# # class below is to jsonify the model
-# class EmployeeSchema(ma.ModelSchema):
-#     class Meta:
-#         model = Employee
+        return Employee.query.filter_by(is_hide=False).all()

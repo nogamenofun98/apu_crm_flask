@@ -28,7 +28,7 @@ def create_app():
     with app.app_context():
         from app.models import IndustryArea, EmailStatus, UserRole, User, UserReportDesign, EmployeeCompany, Employee, \
             Company, CompanyEmailStat, AlumnusEmailStat
-        db.create_all()
+        db.create_all()  # create tables in database
         if not UserRole.UserRole.get_all():
             #  initialise default super admin role, dev advices to assign the role id to a user first before login into the system
             new = UserRole.UserRole(user_role_description="SuperAdmin",
@@ -41,7 +41,7 @@ def create_app():
                                             industry_desc="This default area is for user that can manage all company, which separated from admin role.",
                                             is_read_only=True)
             new.save()
-        migrate = Migrate(app, db)  # provide Flask Migrate command ability
+        migrate = Migrate(app, db, compare_type=True)  # provide Flask Migrate command ability, set column type to detect in migrate
         files_path = Config.UPLOADS_DEFAULT_DEST + 'files/'
         template_path = files_path + "company_template.csv"
         if not os.path.exists(files_path):
@@ -65,6 +65,8 @@ def create_app():
     app.register_blueprint(area_route.industry_area_bp)
     from app.modules.CompanyModule import routes as comp_route
     app.register_blueprint(comp_route.company_bp)
+    from app.modules.EmployeeModule import routes as emp_route
+    app.register_blueprint(emp_route.employee_bp)
 
     from app.services.AuthMiddleware import AuthMiddleware
     app.wsgi_app = AuthMiddleware(app.wsgi_app)

@@ -20,10 +20,13 @@ class ModelOperation(object):
     def commit(self):
         try:
             db.session.commit()
-            return None  # if no error occurred
+            return self  # if no error occurred
         except SQLAlchemyError as ex:
             db.session.rollback()
             if config.Config.DEBUG:
                 return re.sub('[()"]', "", str(ex.__dict__['orig']))
             else:
                 return "Error occurred, please contact technical personnel!"
+
+    def flush(self):
+        db.session.flush()

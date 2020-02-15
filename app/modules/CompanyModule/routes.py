@@ -1,3 +1,5 @@
+import re
+
 from flask import jsonify, request, json, Blueprint
 from flask_uploads import UploadNotAllowed
 
@@ -5,6 +7,7 @@ from app import db, files
 from app.models.Schemas import CompanySchema
 from app.modules.CompanyModule.CompanyController import CompanyController
 from app.modules.UserModule.UserController import UserController
+from app.services.CommonServices import CommonServices
 
 company_bp = Blueprint('company_bp', __name__)
 company_fields = ['company_reg_num', 'company_name', 'company_size', 'company_industry_id',
@@ -35,7 +38,7 @@ def uploader():
             csv_reader = csv.DictReader(csv_file)
             error_message = ""
             for row in csv_reader:
-                is_area_check = check_area(user.user_handle_industry, int(row['company_industry_id']))
+                is_area_check = CommonServices.check_area(user.user_handle_industry, int(row['company_industry_id']))
                 if not is_area_check:
                     error_message += "\r\n" + row[
                         'company_reg_num'] + ": Cannot create company that not belong to logon user\'s industry area. "
@@ -52,7 +55,7 @@ def uploader():
                                                           company_city=row['company_city'],
                                                           company_state=row['company_state'],
                                                           company_country=row['company_country'])
-                    if error is not None:
+                    if type(error) is str:
                         error_message += "\r\n" + row['company_reg_num'] + ": " + error
         response = {
             'status': 'done',
@@ -72,7 +75,13 @@ def routes():
     user = UserController.find_by_id(request.args.get("user_id"))
     if request.method == 'POST':
         data = request.get_json()
-        is_area_check = check_area(user.user_handle_industry, int(data['company_industry_id']))
+        if data['company_industry_id'] == '':
+            response = {
+                'status': 'error',
+                'message': 'Cannot leave industry area empty'
+            }
+            return jsonify(response), 400
+        is_area_check = CommonServices.check_area(user.user_handle_industry, int(data['company_industry_id']))
         if not is_area_check:
             response = {
                 'status': 'error',
@@ -94,7 +103,7 @@ def item_details(item_id):
     user = UserController.find_by_id(request.args.get("user_id"))
     item = CompanyController.find_by_id(item_id)
     if item is not None:
-        is_area_check = check_area(user.user_handle_industry, int(item.company_industry_id))
+        is_area_check = CommonServices.check_area(user.user_handle_industry, int(item.company_industry_id))
         if is_area_check:
             if request.method == 'GET':
                 return get_item_details(item_id)
@@ -113,18 +122,6 @@ def item_details(item_id):
         'message': 'Company not found!'
     }
     return jsonify(response), 400
-
-
-# return true when is belong to "All, read-only", return true also when is same id, return false when is diff id
-def check_area(user_industry, data_industry_id=None):
-    # print("user area id: ", user_industry.industry_id, ", data area id: ", data_industry_id)
-    if user_industry.is_read_only and user_industry.industry_name == "All":
-        return True
-    else:
-        if data_industry_id is not None:
-            if user_industry.industry_id == data_industry_id:
-                return True
-        return False
 
 
 def get_items(industry_area):
@@ -162,7 +159,7 @@ def create_item():
                                           , company_postcode=data['company_postcode'],
                                           company_city=data['company_city'], company_state=data['company_state'],
                                           company_country=data['company_country'])
-    if error is not None:
+    if type(error) is str:
         response = {
             'status': 'error',
             'message': error
@@ -203,24 +200,49 @@ def update_item(item_id):
                 'message': 'Bad request body.'
             }
             return jsonify(response), 400
+    is_error = False
+    error_message = ""
     item = CompanyController.find_by_id(item_id)
-    item.company_reg_num = data['company_reg_num']
-    item.company_name = data['company_name']
-    item.company_size = data['company_size']
-    item.company_industry_id = data['company_industry_id']
-    item.company_desc = data['company_desc']
-    item.company_office_contact_num = data['company_office_contact_num']
-    item.company_address = data['company_address']
-    item.company_postcode = data['company_postcode']
-    item.company_city = data['company_city']
-    item.company_state = data['company_state']
-    item.company_country = data['company_country']
+    if item is not None:
+        is_error = True
+        error_message += "Registration number duplicated! Received value: " + str(
+            item_id)
 
-    db.session.commit()
-    response = {
-        'message': 'Company updated.'
-    }
-    return jsonify(response), 202
+    if not re.match('^(\\+?6?0)[0-9]{1,2}-*[0-9]{7,8}$', str(data['company_office_contact_num'])):
+        is_error = True
+        error_message += "Contact number must be in correct format! Received value: " + str(
+            data['company_office_contact_num'])
+
+    if not data['company_address'] == '':
+        if not re.match('^[0-9]{1,6}$', str(data['company_postcode'])):
+            is_error = True
+            if error_message is not "":
+                error_message += ", "
+            error_message += "Postcode must be in correct format! Received value: " + str(data['company_postcode'])
+    if not is_error:
+        item.company_reg_num = data['company_reg_num']
+        item.company_name = data['company_name']
+        item.company_size = data['company_size']
+        item.company_industry_id = data['company_industry_id']
+        item.company_desc = data['company_desc']
+        item.company_office_contact_num = data['company_office_contact_num']
+        item.company_address = data['company_address']
+        item.company_postcode = data['company_postcode']
+        item.company_city = data['company_city']
+        item.company_state = data['company_state']
+        item.company_country = data['company_country']
+
+        db.session.commit()
+        response = {
+            'message': 'Company updated.'
+        }
+        return jsonify(response), 202
+    else:
+        response = {
+            'status': 'error',
+            'message': error_message
+        }
+        return jsonify(response), 400
 
 
 def delete_item(item_id):
@@ -228,7 +250,7 @@ def delete_item(item_id):
     item.is_hide = True
     db.session.commit()
     # error = item.delete()
-    # if error is not None:
+    # if type(error) is str:
     #     response = {
     #         'status': 'error',
     #         'message': error

@@ -51,7 +51,7 @@ def create_item():
     data = request.get_json()
     if 'user_role_description' in data and 'user_role_json' in data:
         error = UserRoleController.create_item(data['user_role_description'], data['user_role_json'])
-        if error is not None:
+        if type(error) is str:
             response = {
                 'status': 'error',
                 'message': error
@@ -108,7 +108,7 @@ def update_item(item_id):
 def delete_item(item_id):
     role = UserRoleController.find_by_id(item_id)
     error = role.delete()
-    if error is not None:
+    if type(error) is str:
         response = {
             'status': 'error',
             'message': error

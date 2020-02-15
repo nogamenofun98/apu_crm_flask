@@ -51,7 +51,7 @@ def create_item():
     data = request.get_json()
     if 'industry_name' in data and 'industry_desc' in data:
         error = IndustryAreaController.create_item(data['industry_name'], data['industry_desc'])
-        if error is not None:
+        if type(error) is str:
             response = {
                 'status': 'error',
                 'message': error
@@ -108,7 +108,7 @@ def update_item(item_id):
 def delete_item(item_id):
     item = IndustryAreaController.find_by_id(item_id)
     error = item.delete()
-    if error is not None:
+    if type(error) is str:
         response = {
             'status': 'error',
             'message': error

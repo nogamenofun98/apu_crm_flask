@@ -15,3 +15,7 @@ class IndustryAreaController:
     @staticmethod
     def find_by_id(item_id):
         return IndustryArea.query.get(item_id)
+
+    @staticmethod
+    def get_default_all_area() -> IndustryArea:
+        return IndustryArea.query.filter_by(is_read_only=True, industry_name='All').first()

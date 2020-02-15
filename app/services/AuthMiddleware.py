@@ -69,7 +69,7 @@ class AuthMiddleware:
                 user = UserController.find_user_by_username(username)
                 if user is None:
                     error = UserController.create_item(username, full_name, email)
-                    if error is not None:
+                    if type(error) is str:
                         response = {
                             'status': 'error',
                             'message': error

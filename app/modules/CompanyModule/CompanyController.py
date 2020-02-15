@@ -13,18 +13,6 @@ class CompanyController:
             area_id = industry_area.industry_id
             return Company.query.filter_by(company_industry_id=area_id, is_hide=False).all()
 
-    # company_reg_num = db.Column(db.Integer, primary_key=True, autoincrement=False)
-    # company_name = db.Column(db.String(255), nullable=False)
-    # company_size = db.Column(db.Integer, nullable=False)
-    # company_industry_id = db.Column(db.ForeignKey('industry_area.industry_id'), nullable=False, index=True)
-    # company_desc = db.Column(db.String(255), nullable=False)
-    # company_address = db.Column(db.Integer, nullable=False)
-    # company_postcode = db.Column(db.String(255))
-    # company_city = db.Column(db.String(255))
-    # company_state = db.Column(db.String(255))
-    # company_country = db.Column(db.String(255))
-    # company_office_contact_num = db.Column(db.Integer, nullable=False)
-
     @staticmethod
     def create_item(company_reg_num, company_name, company_size, company_industry_id, company_desc,
                     company_office_contact_num, company_address=''
