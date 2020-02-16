@@ -6,6 +6,10 @@ from app.models.Company import Company
 class CompanyController:
 
     @staticmethod
+    def get_columns_name():
+        return Company.__table__.columns.keys()
+
+    @staticmethod
     def get_items(industry_area):
         if industry_area.is_read_only and industry_area.industry_name == "All":
             return Company.get_all()
@@ -62,3 +66,25 @@ class CompanyController:
     @staticmethod
     def find_by_id(item_id):
         return Company.query.filter_by(company_reg_num=item_id, is_hide=False).first()
+
+    @staticmethod
+    def contact_action(company, employee, action):
+        from sqlalchemy.exc import SQLAlchemyError
+        from app import db
+        try:
+            if action == 'add':
+                company.contacts.append(employee)
+                db.session.commit()
+                return "Added Contact"  # if no error occurred
+            elif action == 'delete':
+                company.contacts.remove(employee)
+                db.session.commit()
+                return "Deleted Contact"  # if no error occurred
+        except SQLAlchemyError as ex:
+            db.session.rollback()
+            from app import config
+            if config.Config.DEBUG:
+                import re
+                return re.sub('[()"]', "", str(ex.__dict__['orig']))
+            else:
+                return "Error occurred, please contact technical personnel!"

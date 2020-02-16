@@ -1,5 +1,5 @@
 import re
-
+import flask_excel as excel
 from flask import jsonify, request, json, Blueprint
 from flask_uploads import UploadNotAllowed
 
@@ -13,6 +13,50 @@ company_bp = Blueprint('company_bp', __name__)
 company_fields = ['company_reg_num', 'company_name', 'company_size', 'company_industry_id',
                   'company_desc', 'company_office_contact_num', 'company_address', 'company_postcode', 'company_city',
                   'company_state', 'company_country']
+
+
+@company_bp.route("/companies/<string:item_id>/contacts", defaults={'employee_id': None},
+                  methods=['POST', 'DELETE'])
+@company_bp.route("/companies/<string:item_id>/contacts/<string:employee_id>", methods=['POST', 'DELETE'])
+def get_contacts(item_id, employee_id=None):
+    print("adding contact")
+    item = CompanyController.find_by_id(item_id)
+    from app.modules.EmployeeModule.EmployeeController import EmployeeController
+    employee = EmployeeController.find_by_id(employee_id)
+    if item is not None:
+        if employee is not None:
+            if request.method == 'DELETE':
+                result = CompanyController.contact_action(item, employee, 'delete')
+                response = {
+                    'message': result
+                }
+                return jsonify(response), 202
+            elif request.method == 'POST':
+                result = CompanyController.contact_action(item, employee, 'add')
+                response = {
+                    'message': result
+                }
+                return jsonify(response), 200
+        else:
+            response = {
+                'status': 'error',
+                'message': 'Employee not found!'
+            }
+            return jsonify(response), 400
+    response = {
+        'status': 'error',
+        'message': 'Company not found!'
+    }
+    return jsonify(response), 400
+
+
+@company_bp.route("/companies/export", methods=['GET'])
+def export():
+    if request.method == 'GET':
+        user = UserController.find_by_id(request.args.get("user_id"))
+        query_sets = CompanyController.get_items(user.user_handle_industry)
+        column_names = CompanyController.get_columns_name()
+        return excel.make_response_from_query_sets(query_sets, column_names, "xlsx")
 
 
 @company_bp.route("/companies/uploader", methods=['GET', 'POST'])

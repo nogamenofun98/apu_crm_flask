@@ -27,6 +27,3 @@ class ModelOperation(object):
                 return re.sub('[()"]', "", str(ex.__dict__['orig']))
             else:
                 return "Error occurred, please contact technical personnel!"
-
-    def flush(self):
-        db.session.flush()

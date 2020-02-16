@@ -7,7 +7,7 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_uploads import UploadSet, configure_uploads, patch_request_class
-
+import flask_excel as excel
 from wsgi import app
 
 db = SQLAlchemy()
@@ -24,6 +24,7 @@ def create_app():
     ma.init_app(app)
     configure_uploads(app, files)
     patch_request_class(app)  # set maximum file size, default is 16MB
+    excel.init_excel(app)
 
     with app.app_context():
         from app.models import IndustryArea, EmailStatus, UserRole, User, UserReportDesign, EmployeeCompany, Employee, \

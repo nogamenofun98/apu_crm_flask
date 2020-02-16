@@ -8,6 +8,10 @@ from app.models.EmployeeCompany import EmployeeCompany
 class EmployeeController:
 
     @staticmethod
+    def get_columns_name():
+        return Employee.__table__.columns.keys()
+
+    @staticmethod
     def get_items(industry_area):
         if industry_area.is_read_only and industry_area.industry_name == "All":
             return Employee.get_all()

@@ -1,6 +1,6 @@
 import datetime
 import re
-
+import flask_excel as excel
 from flask import jsonify, request, json, Blueprint
 
 from app import db
@@ -18,6 +18,16 @@ employee_fields = ['employee_full_name', 'employee_industry_id', 'employee_alumn
 
 
 # , 'employee_current_company_Id','current_job_designation', 'current_job_department', 'current_job_hired_date'
+
+@employee_bp.route("/employees/export", methods=['GET'])
+def export():
+    if request.method == 'GET':
+        user = UserController.find_by_id(request.args.get("user_id"))
+        query_sets = EmployeeController.get_items(user.user_handle_industry)
+        column_names = EmployeeController.get_columns_name()
+        # import datetime
+        # date = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        return excel.make_response_from_query_sets(query_sets, column_names, "xlsx")
 
 
 @employee_bp.route("/employees", methods=['GET', 'POST'])
@@ -95,6 +105,11 @@ def get_jobs(item_id, company_id=None):
         'message': 'Employee not found!'
     }
     return jsonify(response), 400
+
+
+@employee_bp.route("/employees/check-emp/<string:item_id>", methods=['GET'])
+def check_reg_num(item_id):
+    return get_item_details(item_id, True)
 
 
 @employee_bp.route("/employees/<string:item_id>", methods=['GET', 'PUT', 'DELETE'])
