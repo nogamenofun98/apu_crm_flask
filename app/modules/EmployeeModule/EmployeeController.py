@@ -124,3 +124,7 @@ class EmployeeController:
     @staticmethod
     def find_by_id(item_id):
         return Employee.query.filter_by(employee_id=item_id, is_hide=False).first()
+
+    @staticmethod
+    def find_by_contact(email):
+        return Employee.query.filter_by(employee_email=email, is_hide=False).first()

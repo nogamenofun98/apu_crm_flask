@@ -107,9 +107,22 @@ def get_jobs(item_id, company_id=None):
     return jsonify(response), 400
 
 
-@employee_bp.route("/employees/check-emp/<string:item_id>", methods=['GET'])
-def check_reg_num(item_id):
-    return get_item_details(item_id, True)
+@employee_bp.route("/employees/check-emp/<string:email>", methods=['GET'])
+def check_reg_num(email):
+    item_schema = EmployeeSchema()
+    item = EmployeeController.find_by_contact(email)
+    if item is None:
+        response = {
+            'message': 'Employee does not exist.'
+        }
+        return jsonify(response), 200 # avoid error message on frontend, so 200
+    result = item_schema.dumps(item)
+    json_response = json.loads(
+        result)  # load back as json object so the response won't treat it as db.String and escape it
+    response = {
+        'data_response': json_response,
+    }
+    return jsonify(response), 200
 
 
 @employee_bp.route("/employees/<string:item_id>", methods=['GET', 'PUT', 'DELETE'])
