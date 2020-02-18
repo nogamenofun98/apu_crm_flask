@@ -34,7 +34,7 @@ def create_app():
             #  initialise default super admin role, dev advices to assign the role id to a user first before login into the system
             new = UserRole.UserRole(user_role_description="SuperAdmin",
                                     user_role_json=json.loads(
-                                        '{"roles":"full","areas":"full","users":"full","companies":"full","employees":"full","reports":"full","emails":"full"}'))
+                                        '{"roles":"full","areas":"full","users":"full","companies":"full","employees":"full","reports":"full","conversations":"full"}'))
             new.save()
         if not IndustryArea.IndustryArea.get_all():
             #  initialise default super admin role, dev advices to assign the role id to a user first before login into the system
@@ -42,7 +42,22 @@ def create_app():
                                             industry_desc="This default area is for user that can manage all company, which separated from admin role.",
                                             is_read_only=True)
             new.save()
-        migrate = Migrate(app, db, compare_type=True)  # provide Flask Migrate command ability, set column type to detect in migrate
+        if not EmailStatus.EmailStatus.get_all():
+            #  initialise default super admin role, dev advices to assign the role id to a user first before login into the system
+            new = EmailStatus.EmailStatus('Lead-Opened', 'New lead')
+            new.save()
+            new = EmailStatus.EmailStatus('Lead-Processing', 'Discussion undergoing on')
+            new.save()
+            new = EmailStatus.EmailStatus('Lead-Closed', 'Closed case on the lead')
+            new.save()
+            new = EmailStatus.EmailStatus('Opportunity-Opened', 'New opportunity')
+            new.save()
+            new = EmailStatus.EmailStatus('Opportunity-Processing', 'Discussion undergoing on')
+            new.save()
+            new = EmailStatus.EmailStatus('Opportunity-Closed', 'Closed case on the opportunity')
+            new.save()
+        migrate = Migrate(app, db,
+                          compare_type=True)  # provide Flask Migrate command ability, set column type to detect in migrate
         files_path = Config.UPLOADS_DEFAULT_DEST + 'files/'
         template_path = files_path + "company_template.csv"
         if not os.path.exists(files_path):
@@ -68,6 +83,8 @@ def create_app():
     app.register_blueprint(comp_route.company_bp)
     from app.modules.EmployeeModule import routes as emp_route
     app.register_blueprint(emp_route.employee_bp)
+    from app.modules.EmailStatModule import routes as email_route
+    app.register_blueprint(email_route.email_bp)
 
     from app.services.AuthMiddleware import AuthMiddleware
     app.wsgi_app = AuthMiddleware(app.wsgi_app)

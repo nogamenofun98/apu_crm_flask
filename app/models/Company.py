@@ -24,7 +24,6 @@ class Company(ModelOperation, db.Model):
     company_state = db.Column(db.String(255))
     company_country = db.Column(db.String(255))
     company_office_contact_num = db.Column(db.String(15), nullable=False)
-    company_last_contact_time = db.Column(db.TIMESTAMP)
     is_hide = db.Column(db.Boolean, nullable=False, server_default=expression.false())
 
     company_industry = db.relationship('IndustryArea', backref="company")

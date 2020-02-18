@@ -21,7 +21,6 @@ class Employee(ModelOperation, db.Model):
     employee_grad_time = db.Column(db.String(255))
     employee_industry_id = db.Column(db.ForeignKey('industry_area.industry_id'), index=True)
     # employee_current_company_Id = db.Column(db.ForeignKey('company.company_reg_num'), index=True)
-    employee_last_contact_time = db.Column(db.String(255))
     employee_alumnus = db.Column(db.Boolean, nullable=False)
     is_hide = db.Column(db.Boolean, nullable=False, server_default=expression.false())
 

@@ -9,6 +9,11 @@ class EmailStatus(ModelOperation, db.Model):
     status_name = db.Column(db.String(255), nullable=False)
     status_description = db.Column(db.String(255))
 
+    def __init__(self, status_name, status_description):
+        super().__init__()
+        self.status_name = status_name
+        self.status_description = status_description
+
     @staticmethod
     def get_all():
         return EmailStatus.query.all()

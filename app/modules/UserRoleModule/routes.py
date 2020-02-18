@@ -39,10 +39,10 @@ def get_items():
             'message': 'No role created.'
         }
         return jsonify(response), 404
-    result = role_schema.dumps(role_list)
-    json_response = json.loads(result)
+    result = role_schema.dump(role_list)
+    # json_response = json.loads(result)
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -76,11 +76,11 @@ def get_item_details(item_id):
             'message': 'Role does not exist.'
         }
         return jsonify(response), 404
-    result = role_schema.dumps(role)
-    json_response = json.loads(
-        result)  # load back as json object so the response won't treat it as db.String and escape it
+    result = role_schema.dump(role)
+    # json_response = json.loads(
+    #     result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -93,7 +93,12 @@ def update_item(item_id):
         role.user_role_description = data['user_role_description']
         role.user_role_json = data['user_role_json']
 
-        db.session.commit()
+        error = role.commit()
+        if type(error) is str:
+            response = {
+                'message': error
+            }
+            return jsonify(response), 400
         response = {
             'message': 'Role updated.'
         }

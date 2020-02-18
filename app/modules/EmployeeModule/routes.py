@@ -62,16 +62,21 @@ def get_jobs(item_id, company_id=None):
         if is_area_check:
             if request.method == 'GET':
                 jobs = EmployeeController.get_jobs(item_id)
-                result = item_schema.dumps(jobs)
-                json_response = json.loads(result)
+                result = item_schema.dump(jobs)
+                # json_response = json.loads(result)
                 response = {
-                    'data_response': json_response,
+                    'data_response': result,
                 }
                 return jsonify(response), 200
             elif request.method == 'DELETE':
                 item = EmployeeController.find_job(item_id, company_id)
                 db.session.delete(item)
-                db.session.commit()
+                error = item.commit()
+                if type(error) is str:
+                    response = {
+                        'message': error
+                    }
+                    return jsonify(response), 400
                 response = {
                     'message': 'Job deleted.'
                 }
@@ -116,11 +121,11 @@ def check_reg_num(email):
             'message': 'Employee does not exist.'
         }
         return jsonify(response), 200 # avoid error message on frontend, so 200
-    result = item_schema.dumps(item)
-    json_response = json.loads(
-        result)  # load back as json object so the response won't treat it as db.String and escape it
+    result = item_schema.dump(item)
+    # json_response = json.loads(
+    #     result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -161,10 +166,10 @@ def get_items(industry_area):
             'message': 'No employee created.'
         }
         return jsonify(response), 404
-    result = item_schema.dumps(item_list)
-    json_response = json.loads(result)
+    result = item_schema.dump(item_list)
+    # json_response = json.loads(result)
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -227,11 +232,11 @@ def get_item_details(item_id, isCheck=False):
             return jsonify(response), 200
         else:
             return jsonify(response), 404
-    result = item_schema.dumps(item)
-    json_response = json.loads(
-        result)  # load back as json object so the response won't treat it as db.String and escape it
+    result = item_schema.dump(item)
+    # json_response = json.loads(
+    #     result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -307,7 +312,12 @@ def update_item(item_id):
             item.employee_intake_code = data['employee_intake_code']
         # if not data['employee_current_company_Id'].strip() == "":
         #     item.employee_current_company_Id = data['employee_current_company_Id']
-        db.session.commit()
+        error = item.commit()
+        if type(error) is str:
+            response = {
+                'message': error
+            }
+            return jsonify(response), 400
         response = {
             'message': 'Employee updated.'
         }
@@ -323,7 +333,12 @@ def update_item(item_id):
 def delete_item(item_id):
     item = EmployeeController.find_by_id(item_id)
     item.is_hide = True
-    db.session.commit()
+    error = item.commit()
+    if type(error) is str:
+        response = {
+            'message': error
+        }
+        return jsonify(response), 400
     response = {
         'message': 'Employee soft deleted.'
     }

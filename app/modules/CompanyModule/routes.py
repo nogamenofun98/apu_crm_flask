@@ -176,10 +176,10 @@ def get_items(industry_area):
             'message': 'No company created.'
         }
         return jsonify(response), 404
-    result = item_schema.dumps(item_list)
-    json_response = json.loads(result)
+    result = item_schema.dump(item_list)
+    # json_response = json.loads(result)
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -226,11 +226,11 @@ def get_item_details(item_id, isCheck=False):
             return jsonify(response), 200
         else:
             return jsonify(response), 404
-    result = item_schema.dumps(item)
-    json_response = json.loads(
-        result)  # load back as json object so the response won't treat it as db.String and escape it
+    result = item_schema.dump(item)
+    # json_response = json.loads(
+    #     result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -276,7 +276,12 @@ def update_item(item_id):
         item.company_state = data['company_state']
         item.company_country = data['company_country']
 
-        db.session.commit()
+        error = item.commit()
+        if type(error) is str:
+            response = {
+                'message': error
+            }
+            return jsonify(response), 400
         response = {
             'message': 'Company updated.'
         }
@@ -292,7 +297,12 @@ def update_item(item_id):
 def delete_item(item_id):
     item = CompanyController.find_by_id(item_id)
     item.is_hide = True
-    db.session.commit()
+    error = item.commit()
+    if type(error) is str:
+        response = {
+            'message': error
+        }
+        return jsonify(response), 400
     # error = item.delete()
     # if type(error) is str:
     #     response = {

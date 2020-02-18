@@ -41,10 +41,10 @@ def get_items():
             'message': 'no user created'
         }
         return jsonify(response), 404
-    result = user_schema.dumps(users_list)
-    user_json = json.loads(result)  # load back as json object so the response won't treat it as db.String and escape it
+    result = user_schema.dump(users_list)
+    # user_json = json.loads(result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
-        'data_response': user_json,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -86,10 +86,10 @@ def get_item_details(user_id):
             'message': 'user does not exist'
         }
         return jsonify(response), 404
-    result = user_schema.dumps(user)
-    user_json = json.loads(result)  # load back as json object so the response won't treat it as db.String and escape it
+    result = user_schema.dump(user)
+    # user_json = json.loads(result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
-        'data_response': user_json,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -102,7 +102,12 @@ def update_item(user_id):
         user.user_role_id = data['user_role']
         user.user_handle_industry_id = data['user_handle_industry']
 
-        db.session.commit()
+        error = user.commit()
+        if type(error) is str:
+            response = {
+                'message': error
+            }
+            return jsonify(response), 400
         response = {
             'message': 'user updated'
         }

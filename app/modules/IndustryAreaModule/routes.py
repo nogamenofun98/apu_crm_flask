@@ -39,10 +39,10 @@ def get_items():
             'message': 'No area created.'
         }
         return jsonify(response), 404
-    result = item_schema.dumps(item_list)
-    json_response = json.loads(result)
+    result = item_schema.dump(item_list)
+    # json_response = json.loads(result)
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -76,11 +76,11 @@ def get_item_details(item_id):
             'message': 'Area does not exist.'
         }
         return jsonify(response), 404
-    result = item_schema.dumps(item)
-    json_response = json.loads(
-        result)  # load back as json object so the response won't treat it as db.String and escape it
+    result = item_schema.dump(item)
+    # json_response = json.loads(
+    #     result)  # load back as json object so the response won't treat it as db.String and escape it
     response = {
-        'data_response': json_response,
+        'data_response': result,
     }
     return jsonify(response), 200
 
@@ -93,7 +93,12 @@ def update_item(item_id):
         item.industry_name = data['industry_name']
         item.industry_desc = data['industry_desc']
 
-        db.session.commit()
+        error = item.commit()
+        if type(error) is str:
+            response = {
+                'message': error
+            }
+            return jsonify(response), 400
         response = {
             'message': 'Area updated.'
         }

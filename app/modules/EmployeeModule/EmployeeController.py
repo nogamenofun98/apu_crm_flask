@@ -27,7 +27,6 @@ class EmployeeController:
     def find_job(employee_id, company_id):
         return EmployeeCompany.query.filter_by(alumnus_id=employee_id, company_id=company_id).first()
 
-
     @staticmethod
     def create_item(employee_full_name, employee_industry_id, employee_alumnus, employee_address='',
                     employee_postcode='', employee_city=''

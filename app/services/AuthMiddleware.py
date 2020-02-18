@@ -18,6 +18,9 @@ class AuthMiddleware:
         if '_uploads/' in request.base_url:
             return self.app(environ, start_response)
 
+        if 'track/conversations/' in request.base_url:
+            return self.app(environ, start_response)
+
         if request.method != 'OPTIONS':
             service = request.args.get("service")
             ticket = request.args.get("ticket")
