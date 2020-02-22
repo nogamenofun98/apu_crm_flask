@@ -189,7 +189,7 @@ def create_graph(download=None):
                     full_where += " AND "
                     full_where += item
                     # full_where += " "
-            full_statement = sql_statement + full_where + after_where_statement
+            full_statement = sql_statement + full_where + after_where_statement + " LIMIT 10"
             print(full_statement)
             year, month = None, None
             if not data['conversationDate'] == '':
@@ -238,7 +238,7 @@ def create_graph(download=None):
                 full_where += " AND "
                 full_where += item
                 # full_where += " "
-            full_statement = sql_statement + full_where + after_where_statement
+            full_statement = sql_statement + full_where + after_where_statement + " LIMIT 10"
             print(full_statement)
             results = None
             if not full_statement == '':
