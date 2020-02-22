@@ -27,7 +27,7 @@ class Company(ModelOperation, db.Model):
     is_hide = db.Column(db.Boolean, nullable=False, server_default=expression.false())
 
     company_industry = db.relationship('IndustryArea', backref="company")
-    contacts = db.relationship('Employee', secondary=t_company_contact, backref="company")
+    contacts = db.relationship('Employee', secondary=t_company_contact, backref="company_contacts")
 
     def __init__(self, company_reg_num, company_name, company_size, company_industry_id, company_desc,
                  company_office_contact_num):

@@ -27,7 +27,44 @@ def export():
         column_names = EmployeeController.get_columns_name()
         # import datetime
         # date = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        # results = []
+        # emp_schema = EmployeeSchema()
+        # work_schema = EmpCompSchema()
+        # for item in query_sets:
+        #     employee = emp_schema.dump(item[0])
+        #     print(item._asdict())
+        #     employee.pop("employee_company")
+        #     employee.pop("company_contacts")
+        #     employee.pop("alumnus_email_stat")
+        #     print(employee)
+        #     work = work_schema.dump(item[1])
+        #     print(work)
+        #     work.pop("employee")
+        #     print(work)
+        #     temp = {**employee, **work}
+        #     results.append(temp)
+        # print(results)
+        # return excel.make_response_from_records(results, "xlsx")
         return excel.make_response_from_query_sets(query_sets, column_names, "xlsx")
+
+
+@employee_bp.route("/employees/unassigned", methods=['GET'])
+def get_unassigned():
+    user = UserController.find_by_id(request.args.get("user_id"))
+    item_schema = EmployeeSchema(many=True)
+    item_list = EmployeeController.get_unassigned_employees(user.user_handle_industry)
+    if item_list is None:
+        response = {
+            'message': 'No employee created.'
+        }
+        return jsonify(response), 404
+    print(item_list)
+    result = item_schema.dump(item_list)
+    # json_response = json.loads(result)
+    response = {
+        'data_response': result,
+    }
+    return jsonify(response), 200
 
 
 @employee_bp.route("/employees", methods=['GET', 'POST'])
@@ -120,7 +157,7 @@ def check_reg_num(email):
         response = {
             'message': 'Employee does not exist.'
         }
-        return jsonify(response), 200 # avoid error message on frontend, so 200
+        return jsonify(response), 200  # avoid error message on frontend, so 200
     result = item_schema.dump(item)
     # json_response = json.loads(
     #     result)  # load back as json object so the response won't treat it as db.String and escape it

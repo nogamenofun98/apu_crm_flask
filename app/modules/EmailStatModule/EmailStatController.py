@@ -24,11 +24,11 @@ class EmailStatController:
     @staticmethod
     def create_item(source, user_id, target_id, conversation, status):
         import datetime
-        updated_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if source == "employee":
-            new = AlumnusEmailStat(user_id, target_id, conversation, status, updated_time)
+            new = AlumnusEmailStat(user_id, target_id, conversation, status, time, time)
         else:
-            new = CompanyEmailStat(user_id, target_id, conversation, status, updated_time)
+            new = CompanyEmailStat(user_id, target_id, conversation, status, time, time)
         return new.save()
 
     @staticmethod

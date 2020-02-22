@@ -20,13 +20,14 @@ class AlumnusEmailStat(ModelOperation, db.Model):
     alu_status = db.relationship('EmailStatus', backref="alumnus_email_stat")
     alu_user = db.relationship('User', backref="alumnus_email_stat")
 
-    def __init__(self, user_id, target_id, conversation, status_id, updated_time):
+    def __init__(self, user_id, target_id, conversation, status_id, open_time, updated_time):
         super().__init__()
         self.alu_user_id = user_id
         self.alu_alumnus_id = target_id
         self.alu_sum_open = 0
         self.alu_status_id = status_id
         self.alu_conversation = conversation
+        self.alu_open_time = open_time
         self.alu_updated_time = updated_time
 
     @staticmethod

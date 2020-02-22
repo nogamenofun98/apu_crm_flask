@@ -12,12 +12,41 @@ class EmployeeController:
         return Employee.__table__.columns.keys()
 
     @staticmethod
+    def get_unassigned_employees(industry_area):
+        from app import db
+        if industry_area.is_read_only and industry_area.industry_name == "All":
+            return db.session.query(Employee).filter_by(
+                is_hide=False).outerjoin(EmployeeCompany,
+                                         Employee.employee_id == EmployeeCompany.alumnus_id).filter_by(
+                alumnus_id=None).all()
+        else:
+            area_id = industry_area.industry_id
+            return db.session.query(Employee).filter_by(
+                employee_industry_id=area_id, is_hide=False).outerjoin(EmployeeCompany,
+                                                                       Employee.employee_id == EmployeeCompany.alumnus_id).filter_by(
+                alumnus_id=None).all()
+
+    @staticmethod
     def get_items(industry_area):
         if industry_area.is_read_only and industry_area.industry_name == "All":
             return Employee.get_all()
         else:
             area_id = industry_area.industry_id
             return Employee.query.filter_by(employee_industry_id=area_id, is_hide=False).all()
+
+    # @staticmethod
+    # def exports(industry_area):
+    #     print("exporting")
+    #     from app import db
+    #     if industry_area.is_read_only and industry_area.industry_name == "All":
+    #         return db.session.query(Employee, EmployeeCompany).filter_by(
+    #             is_hide=False).outerjoin(EmployeeCompany,
+    #                                      Employee.employee_id == EmployeeCompany.alumnus_id).all()
+    #     else:
+    #         area_id = industry_area.industry_id
+    #         return db.session.query(Employee, EmployeeCompany).filter_by(
+    #             is_hide=False).outerjoin(EmployeeCompany,
+    #                                      Employee.employee_id == EmployeeCompany.alumnus_id).all()
 
     @staticmethod
     def get_jobs(employee_id):

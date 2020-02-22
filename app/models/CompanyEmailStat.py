@@ -20,13 +20,14 @@ class CompanyEmailStat(ModelOperation, db.Model):
     comp_status = db.relationship('EmailStatus', backref="company_email_stat")
     comp_user = db.relationship('User', backref="company_email_stat")
 
-    def __init__(self, user_id, target_id, conversation, status_id, updated_time):
+    def __init__(self, user_id, target_id, conversation, status_id, open_time, updated_time):
         super().__init__()
         self.comp_user_id = user_id
         self.comp_comp_id = target_id
         self.comp_sum_open = 0
         self.comp_status_id = status_id
         self.comp_conversation = conversation
+        self.comp_open_time = open_time
         self.comp_updated_time = updated_time
 
     @staticmethod

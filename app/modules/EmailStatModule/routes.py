@@ -75,7 +75,7 @@ def export(source):
         for item in item_list:
             result = serialize_field(source, item)
             result_list.append(result)
-        # print(result_list)
+        print(result_list)
         # column_list = ["email_id", "user_id", "user_full_name", "target_id", "target_name", "open_time", "sum_open",
         #                "status_id", "status_name", "industry_area_id", "industry_area_name", "conversation", "updated_time"]
         return excel.make_response_from_records(result_list, "xlsx")
@@ -92,11 +92,11 @@ def track(source, item_id):
     item = EmailStatController.find_by_id(source, item_id)
     if item is not None:
         if source == "employee":
-            item.alu_open_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # item.alu_open_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             item.alu_sum_open = item.alu_sum_open + 1
             item.commit()
         else:
-            item.comp_open_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # item.comp_open_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             item.comp_sum_open = item.comp_sum_open + 1
             item.commit()
     from flask import redirect
@@ -156,6 +156,7 @@ def get_items(source, user_handle_industry):
     for item in item_list:
         result = serialize_field(source, item)
         result_list.append(result)
+    result_list = sorted(result_list, key=lambda i: i['email_id'], reverse=True)
     response = {
         'data_response': result_list,
     }

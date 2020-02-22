@@ -85,6 +85,8 @@ def create_app():
     app.register_blueprint(emp_route.employee_bp)
     from app.modules.EmailStatModule import routes as email_route
     app.register_blueprint(email_route.email_bp)
+    from app.modules.DashboardModule import routes as home_route
+    app.register_blueprint(home_route.home_bp)
 
     from app.services.AuthMiddleware import AuthMiddleware
     app.wsgi_app = AuthMiddleware(app.wsgi_app)
