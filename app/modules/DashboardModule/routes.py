@@ -35,7 +35,6 @@ def get_word_cloud(source):
 @home_bp.route("/dashboards/report", defaults={'download': None}, methods=['POST'])
 @home_bp.route("/dashboards/report/<string:download>", methods=['POST'])
 def create_graph(download=None):
-    global month
     if request.method == 'POST':
         data = request.get_json()
         for field in graph_fields:
@@ -58,126 +57,76 @@ def create_graph(download=None):
                 print("count conversation")
                 if data["conversationEntity"] == 'company':
                     print("company conversation")
-                    if not data['conversationStatus'] == '':
-                        filter_list.append("company_email_stat.comp_status_id = :status")
-                    if not data['conversationDate'] == '':
-                        filter_list.append(
-                            "MONTH(company_email_stat.comp_open_time) = :month AND YEAR(company_email_stat.comp_open_time) = :year")
-                    # here run area, postcode, state etc filter
-                    if not data['conversationArea'] == '':
-                        print('area')
-                        filter_list.append("company.company_industry_id = :area")
-                    if not data['conversationPostcode'] == '':
-                        print('postcode')
-                        filter_list.append("company.company_postcode = :postcode")
-                    if not data['conversationCity'] == '':
-                        print('city')
-                        filter_list.append("company.company_city = :city")
-                    if not data['conversationState'] == '':
-                        print('state')
-                        filter_list.append("company.company_state = :state")
-                    if not data['conversationCountry'] == '':
-                        print('country')
-                        filter_list.append("company.company_country = :country")
                     sql_statement = "SELECT company.company_name AS name, COUNT(company_email_stat.comp_email_id) AS number FROM company_email_stat INNER JOIN Company ON company_email_stat.comp_comp_id = company.company_reg_num "
                     after_where_statement = " GROUP BY company.company_name ORDER BY COUNT(company_email_stat.comp_email_id) DESC"
-                    # query = session.query(func.count(CompanyEmailStat.comp_email_id)).filter(*filter_list).join(Company,
-                    #                                                                                             CompanyEmailStat.comp_comp_id == Company.company_reg_num).filter(
-                    #     *filter_join_list)
                 elif data['conversationEntity'] == 'employee-a' or data['conversationEntity'] == 'employee':
                     print("employee conversation")
-                    if data['conversationEntity'] == 'employee-a':
-                        filter_list.append("employee.employee_alumnus = 1")
-                    elif data['conversationEntity'] == 'employee':  # non alumni
-                        filter_list.append("employee.employee_alumnus = 0")
-
-                    if not data['conversationStatus'] == '':
-                        filter_list.append("alumnus_email_stat.alu_status_id = :status")
-                    if not data['conversationDate'] == '':
-                        filter_list.append(
-                            "MONTH(alumnus_email_stat.alu_open_time) = :month AND YEAR(alumnus_email_stat.alu_open_time) = :year")
-                    # here run area, postcode, state etc filter
-                    if not data['conversationArea'] == '':
-                        print('area')
-                        filter_list.append("employee.employee_industry_id = :area")
-                    if not data['conversationPostcode'] == '':
-                        print('postcode')
-                        filter_list.append("employee.employee_postcode = :postcode")
-                    if not data['conversationCity'] == '':
-                        print('city')
-                        filter_list.append("employee.employee_city = :city")
-                    if not data['conversationState'] == '':
-                        print('state')
-                        filter_list.append("employee.employee_state = :state")
-                    if not data['conversationCountry'] == '':
-                        print('country')
-                        filter_list.append("employee.employee_country = :country")
                     sql_statement = "SELECT employee.employee_full_name AS name, COUNT(alumnus_email_stat.alu_email_id) AS number FROM alumnus_email_stat INNER JOIN Employee ON alumnus_email_stat.alu_alumnus_id = employee.employee_id "
                     after_where_statement = " GROUP BY employee.employee_full_name ORDER BY COUNT(alumnus_email_stat.alu_email_id) DESC"
-                    # query = session.query(func.count(AlumnusEmailStat.alu_email_id)).filter(*filter_list).join(Employee,
-                    #                                                                                            AlumnusEmailStat.alu_alumnus_id == Employee.employee_id).filter(
-                    #     *filter_join_list)
-
             elif data["conversationType"] == 'track':
-                # open
                 print("sum open")
                 if data["conversationEntity"] == 'company':
                     print("company open")
-                    if not data['conversationStatus'] == '':
-                        filter_list.append("company_email_stat.comp_status_id = :status")
-                    if not data['conversationDate'] == '':
-                        filter_list.append(
-                            "MONTH(company_email_stat.comp_open_time) = :month AND YEAR(company_email_stat.comp_open_time) = :year")
-                    # here run area, postcode, state etc filter
-                    if not data['conversationArea'] == '':
-                        print('area')
-                        filter_list.append("company.company_industry_id = :area")
-                    if not data['conversationPostcode'] == '':
-                        print('postcode')
-                        filter_list.append("company.company_postcode = :postcode")
-                    if not data['conversationCity'] == '':
-                        print('city')
-                        filter_list.append("company.company_city = :city")
-                    if not data['conversationState'] == '':
-                        print('state')
-                        filter_list.append("company.company_state = :state")
-                    if not data['conversationCountry'] == '':
-                        print('country')
-                        filter_list.append("company.company_country = :country")
                     sql_statement = "SELECT company.company_name AS name, SUM(company_email_stat.comp_sum_open) AS number FROM company_email_stat INNER JOIN Company ON company_email_stat.comp_comp_id = company.company_reg_num "
                     after_where_statement = " GROUP BY company.company_name ORDER BY SUM(company_email_stat.comp_sum_open) DESC"
-                    # query = session.query(CompanyEmailStat.comp_sum_open).filter(*filter_list).order_by(
-                    #     CompanyEmailStat.comp_sum_open.desc()).limit(10)
 
                 elif data["conversationEntity"] == 'employee-a' or data['conversationEntity'] == 'employee':
                     print("employee open")
-                    if data['conversationEntity'] == 'employee-a':
-                        filter_list.append("Employee.employee_alumnus = 1")
-                    else:  # non alumni
-                        filter_list.append("Employee.employee_alumnus = 0")
-                    if not data['conversationArea'] == '':
-                        print('area')
-                        filter_list.append("employee.employee_industry_id = :area")
-                    if not data['conversationPostcode'] == '':
-                        print('postcode')
-                        filter_list.append("employee.employee_postcode = :postcode")
-                    if not data['conversationCity'] == '':
-                        print('city')
-                        filter_list.append("employee.employee_city = :city")
-                    if not data['conversationState'] == '':
-                        print('state')
-                        filter_list.append("employee.employee_state = :state")
-                    if not data['conversationCountry'] == '':
-                        print('country')
-                        filter_list.append("employee.employee_country = :country")
-                    print(filter_list)
-                    print('divider')
                     sql_statement = "SELECT employee.employee_full_name AS name, SUM(alumnus_email_stat.alu_sum_open) AS number FROM alumnus_email_stat INNER JOIN Employee ON alumnus_email_stat.alu_alumnus_id = employee.employee_id "
                     after_where_statement = " GROUP BY employee.employee_full_name ORDER BY SUM(alumnus_email_stat.alu_sum_open) DESC"
-                    # query = session.query(AlumnusEmailStat.alu_sum_open).filter(*filter_list).order_by(
-                    #     AlumnusEmailStat.alu_sum_open.desc()).join(Employee,
-                    #                                                AlumnusEmailStat.alu_alumnus_id == Employee.employee_id).filter(
-                    #     *filter_join_list).limit(10)
+
+            #  code below is general filter statement for both count and track
+            if data["conversationEntity"] == 'company':
+                print("company filter")
+                if not data['conversationStatus'] == '':
+                    filter_list.append("company_email_stat.comp_status_id = :status")
+                if not data['conversationDate'] == '':
+                    filter_list.append(
+                        "MONTH(company_email_stat.comp_open_time) = :month AND YEAR(company_email_stat.comp_open_time) = :year")
+                # here run area, postcode, state etc filter
+                if not data['conversationArea'] == '':
+                    print('area')
+                    filter_list.append("company.company_industry_id = :area")
+                if not data['conversationPostcode'] == '':
+                    print('postcode')
+                    filter_list.append("company.company_postcode = :postcode")
+                if not data['conversationCity'] == '':
+                    print('city')
+                    filter_list.append("company.company_city = :city")
+                if not data['conversationState'] == '':
+                    print('state')
+                    filter_list.append("company.company_state = :state")
+                if not data['conversationCountry'] == '':
+                    print('country')
+                    filter_list.append("company.company_country = :country")
+            if data['conversationEntity'] == 'employee-a' or data['conversationEntity'] == 'employee':
+                print("employee filter")
+                if data['conversationEntity'] == 'employee-a':
+                    filter_list.append("employee.employee_alumnus = 1")
+                elif data['conversationEntity'] == 'employee':  # non alumni
+                    filter_list.append("employee.employee_alumnus = 0")
+
+                if not data['conversationStatus'] == '':
+                    filter_list.append("alumnus_email_stat.alu_status_id = :status")
+                if not data['conversationDate'] == '':
+                    filter_list.append(
+                        "MONTH(alumnus_email_stat.alu_open_time) = :month AND YEAR(alumnus_email_stat.alu_open_time) = :year")
+                # here run area, postcode, state etc filter
+                if not data['conversationArea'] == '':
+                    print('area')
+                    filter_list.append("employee.employee_industry_id = :area")
+                if not data['conversationPostcode'] == '':
+                    print('postcode')
+                    filter_list.append("employee.employee_postcode = :postcode")
+                if not data['conversationCity'] == '':
+                    print('city')
+                    filter_list.append("employee.employee_city = :city")
+                if not data['conversationState'] == '':
+                    print('state')
+                    filter_list.append("employee.employee_state = :state")
+                if not data['conversationCountry'] == '':
+                    print('country')
+                    filter_list.append("employee.employee_country = :country")
             full_where = ""
             first = True
             for item in filter_list:

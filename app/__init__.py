@@ -27,7 +27,7 @@ def create_app():
     excel.init_excel(app)
 
     with app.app_context():
-        from app.models import IndustryArea, EmailStatus, UserRole, User, UserReportDesign, EmployeeCompany, Employee, \
+        from app.models import IndustryArea, EmailStatus, UserRole, User, EmployeeCompany, Employee, \
             Company, CompanyEmailStat, AlumnusEmailStat
         db.create_all()  # create tables in database
         if not UserRole.UserRole.get_all():

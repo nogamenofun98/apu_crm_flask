@@ -7,7 +7,6 @@ from app.models.Employee import Employee
 from app.models.EmployeeCompany import EmployeeCompany
 from app.models.IndustryArea import IndustryArea
 from app.models.User import User
-from app.models.UserReportDesign import UserReportDesign
 from app.models.UserRole import UserRole
 
 
@@ -54,9 +53,9 @@ class UserSchema(ma.ModelSchema):
         # faild to nested schema the Role model into the User model when dump out, maybe try ask CTI
 
 
-class UserReportSchema(ma.ModelSchema):
-    class Meta:
-        model = UserReportDesign
+# class UserReportSchema(ma.ModelSchema):
+#     class Meta:
+#         model = UserReportDesign
 
 
 class UserRoleSchema(ma.ModelSchema):
