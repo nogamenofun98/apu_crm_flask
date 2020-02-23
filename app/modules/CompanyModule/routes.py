@@ -50,6 +50,31 @@ def get_contacts(item_id, employee_id=None):
     return jsonify(response), 400
 
 
+@company_bp.route("/companies/<string:item_id>/employee-list", methods=['GET'])
+def get_employee_list(item_id):
+    results = CompanyController.get_employees(item_id)
+    result_list = []
+    for item in results:
+        result = serialize_field(item)
+        result_list.append(result)
+    response = {
+        'data_response': result_list,
+    }
+    return jsonify(response), 200
+
+
+def serialize_field(item):
+    result = {}
+    print(item)
+    result["employee_id"] = item[2].employee_id
+    result["full_name"] = item[2].employee_full_name
+    result["designation"] = item[1].designation
+    result["department"] = item[1].department
+    result["hired_time"] = item[1].hired_time
+
+    return result
+
+
 @company_bp.route("/companies/export", methods=['GET'])
 def export():
     if request.method == 'GET':

@@ -68,6 +68,14 @@ class CompanyController:
         return Company.query.filter_by(company_reg_num=item_id, is_hide=False).first()
 
     @staticmethod
+    def get_employees(item_id):
+        from app.models.EmployeeCompany import EmployeeCompany
+        from app.models.Employee import Employee
+        from app import db
+        return db.session.query(Company, EmployeeCompany, Employee).filter(
+            Company.company_reg_num == item_id, Company.is_hide == False, Company.company_reg_num == EmployeeCompany.company_id, EmployeeCompany.alumnus_id == Employee.employee_id).all()
+
+    @staticmethod
     def contact_action(company, employee, action):
         from sqlalchemy.exc import SQLAlchemyError
         from app import db
