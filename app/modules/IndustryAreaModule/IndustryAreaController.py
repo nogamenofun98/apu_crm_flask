@@ -9,8 +9,13 @@ class IndustryAreaController:
 
     @staticmethod
     def create_item(name, desc, is_read_only=False):
+        name = str(name).strip()
+        desc = str(desc).strip()
+        if name == '':
+            return "Name cannot be empty!"
         new = IndustryArea(industry_name=name, industry_desc=desc, is_read_only=is_read_only)
         return new.save()
+
 
     @staticmethod
     def find_by_id(item_id):

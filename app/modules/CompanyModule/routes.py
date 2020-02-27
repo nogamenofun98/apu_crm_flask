@@ -272,17 +272,48 @@ def update_item(item_id):
     is_error = False
     error_message = ""
     item = CompanyController.find_by_id(item_id)
-    if item is not None:
+    company_reg_num = str(data['company_reg_num']).strip()
+    company_name = str(data['company_name']).strip()
+    company_size = str(data['company_size']).strip()
+    company_desc = str(data['company_desc']).strip()
+
+    if company_reg_num == '':
         is_error = True
-        error_message += "Registration number duplicated! Received value: " + str(
-            item_id)
+        if error_message is not "":
+            error_message += ", "
+        error_message += "Registration number cannot be empty!"
+    else:
+        if item.company_reg_num != data['company_reg_num']:
+            new_item = CompanyController.find_by_id(data['company_reg_num'])
+            if new_item is not None:
+                is_error = True
+                error_message += "Registration number duplicated! Received value: " + str(
+                    item_id)
+
+    if company_name == '':
+        is_error = True
+        if error_message is not "":
+            error_message += ", "
+        error_message += "Name cannot be empty!"
+    if company_size == '':
+        is_error = True
+        if error_message is not "":
+            error_message += ", "
+        error_message += "Size cannot be empty!"
+    if company_desc == '':
+        is_error = True
+        if error_message is not "":
+            error_message += ", "
+        error_message += "Description cannot be empty!"
 
     if not re.match('^(\\+?6?0)[0-9]{1,2}-*[0-9]{7,8}$', str(data['company_office_contact_num'])):
         is_error = True
+        if error_message is not "":
+            error_message += ", "
         error_message += "Contact number must be in correct format! Received value: " + str(
             data['company_office_contact_num'])
 
-    if not data['company_address'] == '':
+    if not data['company_postcode'] == '':
         if not re.match('^[0-9]{1,6}$', str(data['company_postcode'])):
             is_error = True
             if error_message is not "":
@@ -322,6 +353,7 @@ def update_item(item_id):
 def delete_item(item_id):
     item = CompanyController.find_by_id(item_id)
     item.is_hide = True
+    item.company_reg_num = item.company_reg_num + "_hide"
     error = item.commit()
     if type(error) is str:
         response = {

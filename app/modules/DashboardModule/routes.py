@@ -16,12 +16,7 @@ graph_fields = ['source', 'conversationEntity', 'conversationType', 'conversatio
 def get_word_cloud(source):
     conversations = DashboardController.get_conversations(source)
     texts = " ".join(item for conversation in conversations for item in conversation)
-    # same as below
-    # for conversation in conversations:
-    #     for item in conversation:
-    #         print(item)
-    #         texts.join(item)
-    print(texts)
+    # print(texts)
     wordcloud = WordCloud(width=1280, height=720, max_words=100, background_color="white").generate(texts)
     image = wordcloud.to_image()
     image_object = BytesIO()
@@ -144,7 +139,7 @@ def create_graph(download=None):
             if not data['conversationDate'] == '':
                 year, month = data['conversationDate'].split('-')
             results = None
-            if not full_statement == '':
+            if not sql_statement == '':
                 results = session.execute(full_statement,
                                           {'status': data["conversationStatus"], 'month': month, 'year': year,
                                            'area': data["conversationArea"],

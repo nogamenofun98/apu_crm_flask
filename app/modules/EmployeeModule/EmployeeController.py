@@ -14,6 +14,8 @@ class EmployeeController:
     @staticmethod
     def get_unassigned_employees(industry_area):
         from app import db
+        if industry_area is None:
+            return []
         if industry_area.is_read_only and industry_area.industry_name == "All":
             return db.session.query(Employee).filter_by(
                 is_hide=False).outerjoin(EmployeeCompany,
@@ -28,6 +30,8 @@ class EmployeeController:
 
     @staticmethod
     def get_items(industry_area):
+        if industry_area is None:
+            return []
         if industry_area.is_read_only and industry_area.industry_name == "All":
             return Employee.get_all()
         else:
@@ -60,18 +64,17 @@ class EmployeeController:
     def create_item(employee_full_name, employee_industry_id, employee_alumnus, employee_address='',
                     employee_postcode='', employee_city=''
                     , employee_state='', employee_country='', employee_contact_num='', employee_email='',
-                    employee_intake_code='', employee_grad_time='', employee_current_company_Id='',
-                    employee_last_contact_time=''):
+                    employee_intake_code='', employee_grad_time=''):
 
         new = None
         is_error = False
         error_message = ""
         #  check the company is under emp area or not
-        from app.models.Company import Company
-        company = Company.query.filter_by(company_reg_num=employee_current_company_Id, is_hide=False).first()
-        if not company.company_industry_id == employee_industry_id:
-            is_error = True
-            error_message += "Working company must same as employee's industry area"
+        # from app.models.Company import Company
+        # company = Company.query.filter_by(company_reg_num=employee_current_company_Id, is_hide=False).first()
+        # if not company.company_industry_id == employee_industry_id:
+        #     is_error = True
+        #     error_message += "Working company must same as employee's industry area"
         if employee_full_name.strip() == '':
             is_error = True
             if error_message is not "":

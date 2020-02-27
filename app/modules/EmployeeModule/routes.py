@@ -17,34 +17,12 @@ employee_fields = ['employee_full_name', 'employee_industry_id', 'employee_alumn
                    'employee_intake_code', 'employee_grad_time']
 
 
-# , 'employee_current_company_Id','current_job_designation', 'current_job_department', 'current_job_hired_date'
-
 @employee_bp.route("/employees/export", methods=['GET'])
 def export():
     if request.method == 'GET':
         user = UserController.find_by_id(request.args.get("user_id"))
         query_sets = EmployeeController.get_items(user.user_handle_industry)
         column_names = EmployeeController.get_columns_name()
-        # import datetime
-        # date = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
-        # results = []
-        # emp_schema = EmployeeSchema()
-        # work_schema = EmpCompSchema()
-        # for item in query_sets:
-        #     employee = emp_schema.dump(item[0])
-        #     print(item._asdict())
-        #     employee.pop("employee_company")
-        #     employee.pop("company_contacts")
-        #     employee.pop("alumnus_email_stat")
-        #     print(employee)
-        #     work = work_schema.dump(item[1])
-        #     print(work)
-        #     work.pop("employee")
-        #     print(work)
-        #     temp = {**employee, **work}
-        #     results.append(temp)
-        # print(results)
-        # return excel.make_response_from_records(results, "xlsx")
         return excel.make_response_from_query_sets(query_sets, column_names, "xlsx")
 
 
@@ -233,8 +211,7 @@ def create_item():
                                            employee_contact_num=data['employee_contact_num'],
                                            employee_email=data['employee_email'],
                                            employee_intake_code=data['employee_intake_code'],
-                                           employee_grad_time=data['employee_grad_time'],
-                                           employee_current_company_Id=data['employee_current_company_Id'])
+                                           employee_grad_time=data['employee_grad_time'])
     if type(error) is str:
         response = {
             'status': 'error',
@@ -242,16 +219,16 @@ def create_item():
         }
         return jsonify(response), 400
     #  if employee_current_company_Id is not null, then insert into employeecompany table
-    if not str(data['employee_current_company_Id']) == '':
-        job_error = EmployeeController.add_working_job(error.employee_id, data['employee_current_company_Id'],
-                                                       data['current_job_designation'], data['current_job_department'],
-                                                       data['current_job_hired_date'], True)
-        if type(job_error) is str:
-            response = {
-                'status': 'error',
-                'message': error + ", but the employee info still created successfully."
-            }
-            return jsonify(response), 400
+    # if not str(data['employee_current_company_Id']) == '':
+    #     job_error = EmployeeController.add_working_job(error.employee_id, data['employee_current_company_Id'],
+    #                                                    data['current_job_designation'], data['current_job_department'],
+    #                                                    data['current_job_hired_date'], True)
+    #     if type(job_error) is str:
+    #         response = {
+    #             'status': 'error',
+    #             'message': error + ", but the employee info still created successfully."
+    #         }
+    #         return jsonify(response), 400
     response = {
         'message': "New employee registered."
     }

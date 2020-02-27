@@ -7,6 +7,8 @@ class EmailStatController:
     @staticmethod
     def get_items(source, industry_area):
         # print("get conversation")
+        if industry_area is None:
+            return []
         if industry_area.is_read_only and industry_area.industry_name == "All":
             print("is all")
             if source == "employee":
