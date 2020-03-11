@@ -10,7 +10,7 @@ class UserRoleController:
     @staticmethod
     def create_item(desc, role_json):
         desc = str(desc).strip()
-        role_json = str(role_json).strip()
+        # role_json = str(role_json).strip()
         if desc == '':
             return 'Description cannot empty!'
         if role_json == '':

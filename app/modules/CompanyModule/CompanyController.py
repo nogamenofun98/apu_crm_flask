@@ -58,19 +58,19 @@ class CompanyController:
                 error_message += "Postcode must be in correct format! Received value: " + str(company_postcode)
 
         if not is_error:
-            if company_address == '':
-                new = Company(company_reg_num=company_reg_num, company_name=company_name, company_size=company_size,
-                              company_industry_id=company_industry_id, company_desc=company_desc,
-                              company_office_contact_num=company_office_contact_num)
-            else:
-                new = Company.create_with_address(company_reg_num=company_reg_num, company_name=company_name,
-                                                  company_size=company_size, company_industry_id=company_industry_id,
-                                                  company_desc=company_desc,
-                                                  company_address=company_address
-                                                  , company_postcode=company_postcode, company_city=company_city,
-                                                  company_state=company_state, company_country=company_country,
-                                                  company_office_contact_num=company_office_contact_num)
-            # print('Company: ' + new.company_reg_num, new.company_address)
+            new = Company(company_reg_num=company_reg_num, company_name=company_name, company_size=company_size,
+                          company_industry_id=company_industry_id, company_desc=company_desc,
+                          company_office_contact_num=company_office_contact_num)
+            if not company_address.strip() == "":
+                new.company_address = company_address
+            if not company_postcode.strip() == "":
+                new.company_postcode = company_postcode
+            if not company_city.strip() == "":
+                new.company_city = company_city
+            if not company_state.strip() == "":
+                new.company_state = company_state
+            if not company_country.strip() == "":
+                new.company_country = company_country
             return new.save()
         else:
             return error_message

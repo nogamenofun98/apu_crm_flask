@@ -141,6 +141,19 @@ class EmployeeController:
     @staticmethod
     def add_working_job(employee_id, company_id, designation, department, hired_time, isCurrentJob=False):
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        # detect if got same emp_id and comp_id in db first, if got, then update it directly
+        existing = EmployeeController.find_job(employee_id, company_id)
+        if existing is not None:
+            # update the record
+            if not designation.strip() == "":
+                existing.designation = designation
+            if not department.strip() == "":
+                existing.department = department
+            if not hired_time.strip() == "":
+                existing.hired_time = hired_time
+            existing.updated_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            existing.is_current_job = isCurrentJob
+            return existing.commit()
         new = EmployeeCompany(employee_id, company_id)
         if not designation.strip() == "":
             new.designation = designation

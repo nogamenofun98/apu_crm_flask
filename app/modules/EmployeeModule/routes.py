@@ -267,7 +267,7 @@ def update_item(item_id):
     item = EmployeeController.find_by_id(item_id)
     is_error = False
     error_message = ""
-    if data['employee_full_name'].strip() == '':
+    if data['employee_full_name'] is not None and data['employee_full_name'] == '':
         is_error = True
         error_message += "Must provide full name"
     if not type(data['employee_alumnus']) == bool:
@@ -276,7 +276,7 @@ def update_item(item_id):
             error_message += ", "
         error_message += "Must set is APU alumnus or not"
 
-    if not data['employee_contact_num'] == '':
+    if data['employee_contact_num'] is not None and not data['employee_contact_num'] == '':
         if not re.match('^(\\+?6?0)[0-9]{1,2}-*[0-9]{7,8}$', str(data['employee_contact_num'])):
             is_error = True
             if error_message is not "":
@@ -284,7 +284,7 @@ def update_item(item_id):
             error_message += "Contact number must be in correct format! Received value: " + str(
                 data['employee_contact_num'])
 
-    if not data['employee_postcode'] == '':
+    if data['employee_postcode'] is not None and not data['employee_postcode'] == '':
         if not re.match('^[0-9]{1,6}$', str(data['employee_postcode'])):
             is_error = True
             if error_message is not "":
@@ -292,7 +292,8 @@ def update_item(item_id):
             error_message += "Postcode must be in correct format! Received value: " + str(data['employee_postcode'])
     if not str(data['employee_grad_time']) == "":
         try:
-            datetime.datetime.strptime(data['employee_grad_time'], '%Y-%m-%d')
+            if data['employee_grad_time'] is not None:
+                datetime.datetime.strptime(data['employee_grad_time'], '%Y-%m-%d')
         except ValueError as ex:
             is_error = True
             if error_message is not "":
@@ -300,31 +301,31 @@ def update_item(item_id):
             error_message += "Graduation Date format error: " + str(data['employee_grad_time'])
 
     if not is_error:
-        if not data['employee_full_name'].strip() == "":
+        if not data['employee_full_name'] == "":
             item.employee_address = data['employee_full_name']
         if not data['employee_alumnus'] == "":
             item.employee_alumnus = data['employee_alumnus']
-        if not data['employee_address'].strip() == "":
+        if not data['employee_address'] == "":
             item.employee_address = data['employee_address']
         if not data['employee_industry_id'] == "":
             item.employee_industry_id = data['employee_industry_id']
-        if not data['employee_postcode'].strip() == "":
+        if not data['employee_postcode'] == "":
             item.employee_postcode = data['employee_postcode']
-        if not data['employee_city'].strip() == "":
+        if not data['employee_city'] == "":
             item.employee_city = data['employee_city']
-        if not data['employee_state'].strip() == "":
+        if not data['employee_state'] == "":
             item.employee_state = data['employee_state']
-        if not data['employee_country'].strip() == "":
+        if not data['employee_country'] == "":
             item.employee_country = data['employee_country']
-        if not data['employee_contact_num'].strip() == "":
+        if not data['employee_contact_num'] == "":
             item.employee_contact_num = data['employee_contact_num']
-        if not data['employee_grad_time'].strip() == "":
+        if not data['employee_grad_time'] == "":
             item.employee_grad_time = data['employee_grad_time']
-        if not data['employee_email'].strip() == "":
+        if not data['employee_email'] == "":
             item.employee_email = data['employee_email']
-        if not data['employee_intake_code'].strip() == "":
+        if not data['employee_intake_code'] == "":
             item.employee_intake_code = data['employee_intake_code']
-        # if not data['employee_current_company_Id'].strip() == "":
+        # if not data['employee_current_company_Id'] == "":
         #     item.employee_current_company_Id = data['employee_current_company_Id']
         error = item.commit()
         if type(error) is str:

@@ -17,6 +17,8 @@ def get_word_cloud(source):
     conversations = DashboardController.get_conversations(source)
     texts = " ".join(item for conversation in conversations for item in conversation)
     # print(texts)
+    if len(texts) <= 0:
+        texts = "None"
     wordcloud = WordCloud(width=1280, height=720, max_words=100, background_color="white").generate(texts)
     image = wordcloud.to_image()
     image_object = BytesIO()

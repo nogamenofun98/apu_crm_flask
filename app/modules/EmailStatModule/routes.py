@@ -204,34 +204,35 @@ def create_item(source, user_id):
 
 def update_item(source, item_id):
     user = UserController.find_by_id(request.args.get("user_id"))
-    import datetime
-    updated_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # import datetime
+    # updated_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     data = request.get_json()
     if 'target_id' in data and 'conversation' in data and "status_id" in data:
-        email = EmailStatController.find_by_id(source, item_id)
-        if source == "employee":
-            email.alu_user_id = user.user_id  # to show latest user who edit the record
-            email.alu_alumnus_id = data['target_id']
-            email.alu_conversation = data['conversation']
-            email.alu_status_id = data['status_id']
-            email.alu_updated_time = updated_time
-        else:
-            email.comp_user_id = user.user_id  # to show latest user who edit the record
-            email.comp_comp_id = data['target_id']
-            email.comp_conversation = data['conversation']
-            email.comp_status_id = data['status_id']
-            email.comp_updated_time = updated_time
-
-        error = email.commit()
-        if type(error) is str:
-            response = {
-                'message': error
-            }
-            return jsonify(response), 400
-        response = {
-            'message': 'Conversation updated.'
-        }
-        return jsonify(response), 202
+        return create_item(source, user.user_id) # changed from edit conversation to create new conversation every time user update it
+        # email = EmailStatController.find_by_id(source, item_id)
+        # if source == "employee":
+        #     email.alu_user_id = user.user_id  # to show latest user who edit the record
+        #     email.alu_alumnus_id = data['target_id']
+        #     email.alu_conversation = data['conversation']
+        #     email.alu_status_id = data['status_id']
+        #     email.alu_updated_time = updated_time
+        # else:
+        #     email.comp_user_id = user.user_id  # to show latest user who edit the record
+        #     email.comp_comp_id = data['target_id']
+        #     email.comp_conversation = data['conversation']
+        #     email.comp_status_id = data['status_id']
+        #     email.comp_updated_time = updated_time
+        #
+        # error = email.commit()
+        # if type(error) is str:
+        #     response = {
+        #         'message': error
+        #     }
+        #     return jsonify(response), 400
+        # response = {
+        #     'message': 'Conversation updated.'
+        # }
+        # return jsonify(response), 202
     response = {
         'status': 'error',
         'message': 'Bad request body.'
