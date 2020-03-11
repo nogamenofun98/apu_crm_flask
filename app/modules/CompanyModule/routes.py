@@ -63,11 +63,32 @@ def get_employee_list(item_id):
     return jsonify(response), 200
 
 
+@company_bp.route("/companies/<string:item_id>/employee-list/download", methods=['GET'])
+def download_employee_list(item_id):
+    results = CompanyController.get_employees(item_id)
+    result_list = []
+    for item in results:
+        result = serialize_field(item)
+        result_list.append(result)
+    return excel.make_response_from_records(result_list, "xlsx")
+
+
 def serialize_field(item):
     result = {}
     print(item)
     result["employee_id"] = item[2].employee_id
     result["full_name"] = item[2].employee_full_name
+    result["employee_email"] = item[2].employee_email
+    result["employee_contact_num"] = item[2].employee_contact_num
+    result["employee_address"] = item[2].employee_address
+    result["employee_postcode"] = item[2].employee_postcode
+    result["employee_city"] = item[2].employee_city
+    result["employee_state"] = item[2].employee_state
+    result["employee_country"] = item[2].employee_country
+    result["is_Alumni"] = item[2].employee_alumnus
+    result["employee_grad_time"] = item[2].employee_grad_time
+    result["intake_code"] = item[2].employee_intake_code
+    result["is_hide"] = item[2].is_hide
     result["designation"] = item[1].designation
     result["department"] = item[1].department
     result["hired_time"] = item[1].hired_time

@@ -75,9 +75,6 @@ def export(source):
         for item in item_list:
             result = serialize_field(source, item)
             result_list.append(result)
-        print(result_list)
-        # column_list = ["email_id", "user_id", "user_full_name", "target_id", "target_name", "open_time", "sum_open",
-        #                "status_id", "status_name", "industry_area_id", "industry_area_name", "conversation", "updated_time"]
         return excel.make_response_from_records(result_list, "xlsx")
 
 
